@@ -396,3 +396,7 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+Starter files/.idea
+.DS_Store
+Starter files/CourseLibrary.API/library.db-shm
+Starter files/CourseLibrary.API/library.db-wal

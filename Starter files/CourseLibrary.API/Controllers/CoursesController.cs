@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CourseLibrary.API.Controllers;
 
 [ApiController]
-[Route("api/author/{authorId}/courses")]
+[Route("api/authors/{authorId}/courses")]
 public class CoursesController(ICourseLibraryRepository courseLibraryRepository,
     IMapper mapper) : ControllerBase
 {
