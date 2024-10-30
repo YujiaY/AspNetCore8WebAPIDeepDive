@@ -17,7 +17,8 @@ public class AuthorsController(
     private readonly IMapper _mapper = mapper ??
             throw new ArgumentNullException(nameof(mapper));
 
-    [HttpGet] 
+    [HttpGet]
+    [HttpHead]
     public async Task<ActionResult<IEnumerable<AuthorDto>>> GetAuthors()
     { 
         // get authors from repo
