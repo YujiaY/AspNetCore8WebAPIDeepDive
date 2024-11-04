@@ -21,6 +21,7 @@ public class AuthorsController(
     [HttpHead]
     public async Task<ActionResult<IEnumerable<AuthorDto>>> GetAuthors()
     { 
+        // throw new Exception("Test exception");
         // get authors from repo
         var authorsFromRepo = await _courseLibraryRepository
             .GetAuthorsAsync(); 
@@ -45,9 +46,9 @@ public class AuthorsController(
     }
 
     [HttpPost]
-    public async Task<ActionResult<AuthorDto>> CreateAuthor(AuthorDto author)
+    public async Task<ActionResult<AuthorDto>> CreateAuthor(AuthorForCreationDto authorDto)
     {
-        var authorEntity = _mapper.Map<Entities.Author>(author);
+        var authorEntity = _mapper.Map<Entities.Author>(authorDto);
 
         _courseLibraryRepository.AddAuthor(authorEntity);
         await _courseLibraryRepository.SaveAsync();
