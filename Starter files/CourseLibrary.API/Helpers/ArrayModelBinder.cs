@@ -32,13 +32,13 @@ public class ArrayModelBinder : IModelBinder
         TypeConverter converter = TypeDescriptor.GetConverter(elementType);
 
         // Convert each item in the value list to the enumerable type
-        var values = value.Split(new[] {","},
+        object?[] values = value.Split(new[] {","},
             StringSplitOptions.RemoveEmptyEntries)
             .Select(x => converter.ConvertFromString(x.Trim()))
             .ToArray();
 
         // Create an array of that type, and set it as the Model value
-        var typedValues = Array.CreateInstance(elementType, values.Length);
+        Array typedValues = Array.CreateInstance(elementType, values.Length);
         values.CopyTo(typedValues, 0);
         bindingContext.Model = typedValues;
 
