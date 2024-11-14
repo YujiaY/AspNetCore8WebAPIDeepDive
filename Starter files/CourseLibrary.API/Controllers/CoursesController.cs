@@ -169,5 +169,4 @@ public class CoursesController(ICourseLibraryRepository courseLibraryRepository,
 
         return NoContent();
     }
-
 }
