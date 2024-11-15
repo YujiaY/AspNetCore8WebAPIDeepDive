@@ -1,6 +1,8 @@
 ﻿using CourseLibrary.API.DbContexts;
 using CourseLibrary.API.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -28,7 +30,37 @@ internal static class StartupHelperExtensions
                 setupAction.SerializerSettings.ContractResolver =
                     new CamelCasePropertyNamesContractResolver();
             })
-            .AddXmlDataContractSerializerFormatters();
+            .AddXmlDataContractSerializerFormatters()
+            .ConfigureApiBehaviorOptions(setupAction =>
+            {
+                setupAction.InvalidModelStateResponseFactory = context =>
+                {
+                    // Create a validation problem details object
+                    ProblemDetailsFactory? problemDetailsFactory = context.HttpContext
+                        .RequestServices.GetService<ProblemDetailsFactory>();
+                    
+                    ValidationProblemDetails? validationProblemDetails = problemDetailsFactory?
+                        .CreateValidationProblemDetails(
+                            context.HttpContext, context.ModelState);
+
+                    if (validationProblemDetails != null)
+                    {
+                        // Add additional info not added by default
+                        validationProblemDetails.Detail = "See the errors field for more details.";
+                        validationProblemDetails.Instance = context.HttpContext.Request.Path;
+                        
+                        // Report invalid model state response as validation issues
+                        validationProblemDetails.Type = "https://courselibrary.com/modelvalidationproblem";
+                        validationProblemDetails.Status = StatusCodes.Status422UnprocessableEntity;
+                        validationProblemDetails.Title = "One or more validation errors occurred.";
+                    }
+                    
+                    return new UnprocessableEntityObjectResult(validationProblemDetails)
+                    {
+                        ContentTypes = { "application/problem+json" }
+                    };
+                };
+            });
 
         builder.Services.AddScoped<ICourseLibraryRepository, 
             CourseLibraryRepository>();
