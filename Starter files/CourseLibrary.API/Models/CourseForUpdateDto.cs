@@ -1,7 +1,14 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace CourseLibrary.API.Models;
 
-public class CourseForUpdateDto
+public class CourseForUpdateDto : CourseForManipulationDto
 {
-    public string Title { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
+    [Required(ErrorMessage = "You should provide a Description.")]
+    [MaxLength(1500, ErrorMessage = "The description should not exceed 1500 characters.")]
+    public override string Description
+    {
+        get => base.Description;
+        set => base.Description = value;
+    }
 }
