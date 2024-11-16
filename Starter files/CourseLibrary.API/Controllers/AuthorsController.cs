@@ -18,12 +18,13 @@ public class AuthorsController(
 
     [HttpGet]
     [HttpHead]
-    public async Task<ActionResult<IEnumerable<AuthorDto>>> GetAuthors()
+    public async Task<ActionResult<IEnumerable<AuthorDto>>> GetAuthors(
+       [FromQuery(Name = "mainCategory")] string? mainCategory = "")
     { 
         // throw new Exception("Test exception");
         // get authors from repo
         var authorsFromRepo = await _courseLibraryRepository
-            .GetAuthorsAsync(); 
+            .GetAuthorsAsync(mainCategory); 
 
         // return them
         return Ok(_mapper.Map<IEnumerable<AuthorDto>>(authorsFromRepo));
