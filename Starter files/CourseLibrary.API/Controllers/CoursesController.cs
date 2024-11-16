@@ -123,7 +123,15 @@ public class CoursesController(ICourseLibraryRepository courseLibraryRepository,
         {
             // return NotFound();
             var courseDto = new CourseForUpdateDto();
-            patchDocument.ApplyTo(courseDto);
+            // patchDocument.ApplyTo(courseDto);
+            patchDocument.ApplyTo(courseDto, ModelState);
+            
+            if (!TryValidateModel(courseDto))
+            {
+                var validationResult = ValidationProblem(ModelState);
+                return validationResult;
+            }
+            
             var courseToAdd = _mapper.Map<Entities.Course>(courseDto);
             courseToAdd.Id = courseId;
 
