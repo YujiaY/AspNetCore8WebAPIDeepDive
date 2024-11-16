@@ -3,7 +3,7 @@ using CourseLibrary.API.Models;
 
 namespace CourseLibrary.API.ValidationAttributes;
 
-public class CourseTitleMustBeDifferentFromDescriptionAttribute() : ValidationAttribute
+public class CourseTitleMustBeDifferentFromDescriptionAttribute : ValidationAttribute
 {
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
