@@ -146,14 +146,23 @@ public class CourseLibraryRepository(CourseLibraryContext context) : ICourseLibr
             );
         }
 
-        // return await collection
-        //     .Skip(authorsResourceParameters.PageSize * (authorsResourceParameters.PageNumber - 1))
-        //     .Take(authorsResourceParameters.PageSize)
-        //     .ToListAsync();
+        if (!string.IsNullOrWhiteSpace(authorsResourceParameters.OrderBy))
+        {
+            if (authorsResourceParameters.OrderBy.ToLowerInvariant() == "name")
+            {
+                collection = collection.OrderBy(a => a.FirstName)
+                    .ThenBy(a => a.LastName);
+            }
+        }
         
         return await PageList<Author>.CreateAsync(collection,
             authorsResourceParameters.PageNumber,
             authorsResourceParameters.PageSize);
+
+        // return await collection
+        //     .Skip(authorsResourceParameters.PageSize * (authorsResourceParameters.PageNumber - 1))
+        //     .Take(authorsResourceParameters.PageSize)
+        //     .ToListAsync();
     }
 
     public async Task<IEnumerable<Author>> GetAuthorsAsync(IEnumerable<Guid> authorIds)
