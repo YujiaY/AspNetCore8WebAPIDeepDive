@@ -1,4 +1,7 @@
-﻿using AutoMapper;
+﻿using System.Text.Json;
+using AutoMapper;
+using CourseLibrary.API.Entities;
+using CourseLibrary.API.Helpers;
 using CourseLibrary.API.Models;
 using CourseLibrary.API.ResourceParameters;
 using CourseLibrary.API.Services;
@@ -17,15 +20,70 @@ public class AuthorsController(
     private readonly IMapper _mapper = mapper ??
             throw new ArgumentNullException(nameof(mapper));
 
-    [HttpGet]
+    private string? CreateAuthorResourceUri(AuthorsResourceParameters authorsResourceParameters,
+        ResourceUriType uriType)
+    {
+        return uriType switch
+        {
+            ResourceUriType.PreviousPage => Url.Link(nameof(GetAuthors),
+                new
+                {
+                    pageNumber = authorsResourceParameters.PageNumber - 1,
+                    pageSize = authorsResourceParameters.PageSize,
+                    mainCategory = authorsResourceParameters.MainCategory,
+                    searchQuery = authorsResourceParameters.SearchQuery,
+                }),
+
+            ResourceUriType.NextPage => Url.Link(nameof(GetAuthors),
+                new
+                {
+                    pageNumber = authorsResourceParameters.PageNumber + 1,
+                    pageSize = authorsResourceParameters.PageSize,
+                    mainCategory = authorsResourceParameters.MainCategory,
+                    searchQuery = authorsResourceParameters.SearchQuery,
+                }),
+
+            _ => Url.Link(nameof(GetAuthors),
+                new
+                {
+                    pageNumber = authorsResourceParameters.PageNumber,
+                    pageSize = authorsResourceParameters.PageSize,
+                    mainCategory = authorsResourceParameters.MainCategory,
+                    searchQuery = authorsResourceParameters.SearchQuery,
+                })
+        };
+    }
+    
+    [HttpGet(Name = nameof(GetAuthors))]
     [HttpHead]
     public async Task<ActionResult<IEnumerable<AuthorDto>>> GetAuthors(
         [FromQuery] AuthorsResourceParameters authorsResourceParameters)
     { 
         // throw new Exception("Test exception");
         // get authors from repo
-        var authorsFromRepo = await _courseLibraryRepository
-            .GetAuthorsAsync(authorsResourceParameters); 
+        PageList<Author> authorsFromRepo = await _courseLibraryRepository
+            .GetAuthorsAsync(authorsResourceParameters);
+
+        string? previousPageLink = authorsFromRepo.HasPreviousPage
+            ? CreateAuthorResourceUri(authorsResourceParameters, ResourceUriType.PreviousPage)
+            : null;
+
+        string? nextPageLink = authorsFromRepo.HasNextPage
+            ? CreateAuthorResourceUri(authorsResourceParameters, ResourceUriType.NextPage)
+            : null;
+
+        var paginationMetadata = new
+        {
+            totalCount = authorsFromRepo.TotalCount,
+            pageSize = authorsFromRepo.PageSize,
+            currentPage = authorsFromRepo.CurrentPage,
+            totalPages = authorsFromRepo.TotalPages,
+            previousPageLink,
+            nextPageLink,
+        };
+        
+        Response.Headers.Add("X-Pagination", 
+            JsonSerializer.Serialize(paginationMetadata));
 
         // return them
         return Ok(_mapper.Map<IEnumerable<AuthorDto>>(authorsFromRepo));

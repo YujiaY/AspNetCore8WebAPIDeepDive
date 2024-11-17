@@ -4,8 +4,8 @@ namespace CourseLibrary.API.Helpers;
 
 public class PageList<T> : List<T>
 {
-    private int CurrentPage { get; set; }
-    private int TotalPages { get; set; }
+    public int CurrentPage { get; set; }
+    public int TotalPages { get; set; }
     public int PageSize { get; private set; }
     public int TotalCount { get; private set; }
     public bool HasPreviousPage => CurrentPage > 1;
