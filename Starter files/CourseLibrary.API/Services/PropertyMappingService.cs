@@ -10,7 +10,7 @@ public class PropertyMappingService : IPropertyMappingService
         {
             { "Id", new(new[] { "Id" }) },
             { "MainCategory", new(new[] { "MainCategory" }) },
-            { "Age", new(new[] { "Age" }) },
+            { "Age", new(new[] { "DateOfBirth" }, true) },
             { "Name", new(new[] { "FirstName", "LastName" }) },
         };
     

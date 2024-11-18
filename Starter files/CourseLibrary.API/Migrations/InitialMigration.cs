@@ -57,7 +57,7 @@ namespace CourseLibrary.API.Migrations
                     { new Guid("2902b665-1190-4c70-9915-b9c2d7680450"), 1264753115136000060L, "Eli", "Ivory Bones Sweet", "Singing" },
                     { new Guid("2aadd2df-7caf-45ab-9355-7f6332985a87"), 1279813091328000120L, "Rutherford", "Fearless Cloven", "General debauchery" },
                     { new Guid("2ee49fe3-edf2-4f91-8409-3eb25ce6ca51"), 1280793378816000120L, "Atherton", "Crow Ridley", "Rum" },
-                    { new Guid("5b3621c0-7b12-4e80-9c8b-3398cba7ee05"), 1264066560000000060L, "Seabury", "Toxic Reyson", "Maps" },
+                    { new Guid("5b3621c0-7b12-4e80-9c8b-3398cba7ee05"), 1264248815616000060L, "Seabury", "Toxic Reyson", "Maps" },
                     { new Guid("d28888e9-2ba9-473a-a40f-e38cb54f9b35"), 1279360106496000120L, "Berry", "Griffin Beak Eldritch", "Ships" },
                     { new Guid("da2fd609-d754-4feb-8acd-c4f9ff13ba96"), 1277955145728000120L, "Nancy", "Swashbuckler Rye", "Rum" }
                 });
