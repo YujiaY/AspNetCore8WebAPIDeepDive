@@ -36,4 +36,38 @@ public class PropertyMappingService : IPropertyMappingService
                             $"for <{typeof(TSource)}, {typeof(TDestination)}>.");
     }
 
+    public bool ValidMappingExistsFor<TSource, TDestination>(string fields)
+    {
+        var propertyMapping = GetPropertyMapping<TSource, TDestination>();
+
+        if (string.IsNullOrWhiteSpace(fields))
+        {
+            return true;
+        }
+        
+        // the string is separated by "," so we split it
+        var fieldsAfterSplit = fields.Split(',');
+        
+        // run through the fields clause
+        foreach (string field in fieldsAfterSplit)
+        {
+            // trim
+            var fieldTrimmed = field.Trim();
+            
+            // remove everything after the first " ", if the fields
+            // are coming from an orderBy string, this part must be ignored
+            var indexOfFirstSpace = fieldTrimmed.IndexOf(" ", StringComparison.Ordinal);
+            var propertyName = indexOfFirstSpace == -1 ?
+                fieldTrimmed : fieldTrimmed.Remove(indexOfFirstSpace);
+            
+            // find the matching property
+            if (!propertyMapping.ContainsKey(propertyName))
+            {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
 }

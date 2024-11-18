@@ -12,9 +12,12 @@ namespace CourseLibrary.API.Controllers;
 [ApiController]
 [Route("api/authors")]
 public class AuthorsController(
+    IPropertyMappingService propertyMappingService,
     ICourseLibraryRepository courseLibraryRepository,
     IMapper mapper) : ControllerBase
 {
+    private readonly IPropertyMappingService _propertyMappingService = propertyMappingService ??
+            throw new ArgumentNullException(nameof(propertyMappingService));
     private readonly ICourseLibraryRepository _courseLibraryRepository = courseLibraryRepository ??
             throw new ArgumentNullException(nameof(courseLibraryRepository));
     private readonly IMapper _mapper = mapper ??
@@ -63,6 +66,12 @@ public class AuthorsController(
         [FromQuery] AuthorsResourceParameters authorsResourceParameters)
     { 
         // throw new Exception("Test exception");
+        if (!_propertyMappingService.ValidMappingExistsFor<AuthorDto, Author>(
+                authorsResourceParameters.OrderBy))
+        {
+            return BadRequest("OrderBy query is not valid.");
+        }
+        
         // get authors from repo
         PageList<Author> authorsFromRepo = await _courseLibraryRepository
             .GetAuthorsAsync(authorsResourceParameters);
