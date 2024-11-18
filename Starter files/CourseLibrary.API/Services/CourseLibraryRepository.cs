@@ -1,14 +1,20 @@
 ﻿using CourseLibrary.API.DbContexts;
 using CourseLibrary.API.Entities;
 using CourseLibrary.API.Helpers;
+using CourseLibrary.API.Models;
 using CourseLibrary.API.ResourceParameters;
 using Microsoft.EntityFrameworkCore;
 
 namespace CourseLibrary.API.Services;
 
-public class CourseLibraryRepository(CourseLibraryContext context) : ICourseLibraryRepository 
+public class CourseLibraryRepository(
+    CourseLibraryContext context,
+    IPropertyMappingService propertyMappingService
+    ) : ICourseLibraryRepository 
 {
     private readonly CourseLibraryContext _context = context ?? throw new ArgumentNullException(nameof(context));
+    private readonly IPropertyMappingService _propertyMappingService = propertyMappingService
+        ?? throw new ArgumentNullException(nameof(propertyMappingService));
 
     public void AddCourse(Guid authorId, Course course)
     {
@@ -148,11 +154,16 @@ public class CourseLibraryRepository(CourseLibraryContext context) : ICourseLibr
 
         if (!string.IsNullOrWhiteSpace(authorsResourceParameters.OrderBy))
         {
-            if (authorsResourceParameters.OrderBy.ToLowerInvariant() == "name")
-            {
-                collection = collection.OrderBy(a => a.FirstName)
-                    .ThenBy(a => a.LastName);
-            }
+            // Get property mapping dictionary
+            var authorPropertyMappingDictionary = _propertyMappingService.GetPropertyMapping<AuthorDto, Author>();
+            collection = collection.ApplySort(authorsResourceParameters.OrderBy, authorPropertyMappingDictionary);
+            
+            // if (authorsResourceParameters.OrderBy.ToLowerInvariant() == "name")
+            // {
+            //     collection = collection.OrderBy(a => a.FirstName)
+            //         .ThenBy(a => a.LastName);
+            // }
+            
         }
         
         return await PageList<Author>.CreateAsync(collection,
