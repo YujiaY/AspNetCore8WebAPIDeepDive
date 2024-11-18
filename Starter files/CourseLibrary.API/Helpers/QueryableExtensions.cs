@@ -2,7 +2,7 @@ using CourseLibrary.API.Services;
 using System.Linq.Dynamic.Core;
 namespace CourseLibrary.API.Helpers;
 
-public static class IQueryableExtentions
+public static class QueryableExtensions
 {
     public static IQueryable<T> ApplySort<T>(
         this IQueryable<T> source,

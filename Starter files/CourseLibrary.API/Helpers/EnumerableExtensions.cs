@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace CourseLibrary.API.Helpers;
 
-public static class IEnumerableExtentions
+public static class EnumerableExtensions
 {
     public static IEnumerable<ExpandoObject> ShapeData<TSource>(
         this IEnumerable<TSource> sources,
