@@ -31,6 +31,7 @@ public class AuthorsController(
             ResourceUriType.PreviousPage => Url.Link(nameof(GetAuthors),
                 new
                 {
+                    fields = authorsResourceParameters.Fields,
                     orderBy = authorsResourceParameters.OrderBy,
                     pageNumber = authorsResourceParameters.PageNumber - 1,
                     pageSize = authorsResourceParameters.PageSize,
@@ -41,6 +42,7 @@ public class AuthorsController(
             ResourceUriType.NextPage => Url.Link(nameof(GetAuthors),
                 new
                 {
+                    fields = authorsResourceParameters.Fields,
                     orderBy = authorsResourceParameters.OrderBy,
                     pageNumber = authorsResourceParameters.PageNumber + 1,
                     pageSize = authorsResourceParameters.PageSize,
@@ -51,6 +53,7 @@ public class AuthorsController(
             _ => Url.Link(nameof(GetAuthors),
                 new
                 {
+                    fields = authorsResourceParameters.Fields,
                     orderBy = authorsResourceParameters.OrderBy,
                     pageNumber = authorsResourceParameters.PageNumber,
                     pageSize = authorsResourceParameters.PageSize,
@@ -62,7 +65,7 @@ public class AuthorsController(
     
     [HttpGet(Name = nameof(GetAuthors))]
     [HttpHead]
-    public async Task<ActionResult<IEnumerable<AuthorDto>>> GetAuthors(
+    public async Task<IActionResult> GetAuthors(
         [FromQuery] AuthorsResourceParameters authorsResourceParameters)
     { 
         // throw new Exception("Test exception");
@@ -98,7 +101,8 @@ public class AuthorsController(
             JsonSerializer.Serialize(paginationMetadata));
 
         // return them
-        return Ok(_mapper.Map<IEnumerable<AuthorDto>>(authorsFromRepo));
+        return Ok(_mapper.Map<IEnumerable<AuthorDto>>(authorsFromRepo)
+                .ShapeData(authorsResourceParameters.Fields));
     }
 
     [HttpGet("{authorId}", Name = "GetAuthor")]
