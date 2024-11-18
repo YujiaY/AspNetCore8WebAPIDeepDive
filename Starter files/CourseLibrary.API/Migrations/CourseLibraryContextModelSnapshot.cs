@@ -81,7 +81,7 @@ namespace CourseLibrary.API.Migrations
                         new
                         {
                             Id = new Guid("5b3621c0-7b12-4e80-9c8b-3398cba7ee05"),
-                            DateOfBirth = 1264066560000000060L,
+                            DateOfBirth = 1264248815616000060L,
                             FirstName = "Seabury",
                             LastName = "Toxic Reyson",
                             MainCategory = "Maps"

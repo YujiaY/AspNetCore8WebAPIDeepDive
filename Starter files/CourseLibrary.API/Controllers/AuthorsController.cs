@@ -28,6 +28,7 @@ public class AuthorsController(
             ResourceUriType.PreviousPage => Url.Link(nameof(GetAuthors),
                 new
                 {
+                    orderBy = authorsResourceParameters.OrderBy,
                     pageNumber = authorsResourceParameters.PageNumber - 1,
                     pageSize = authorsResourceParameters.PageSize,
                     mainCategory = authorsResourceParameters.MainCategory,
@@ -37,6 +38,7 @@ public class AuthorsController(
             ResourceUriType.NextPage => Url.Link(nameof(GetAuthors),
                 new
                 {
+                    orderBy = authorsResourceParameters.OrderBy,
                     pageNumber = authorsResourceParameters.PageNumber + 1,
                     pageSize = authorsResourceParameters.PageSize,
                     mainCategory = authorsResourceParameters.MainCategory,
@@ -46,6 +48,7 @@ public class AuthorsController(
             _ => Url.Link(nameof(GetAuthors),
                 new
                 {
+                    orderBy = authorsResourceParameters.OrderBy,
                     pageNumber = authorsResourceParameters.PageNumber,
                     pageSize = authorsResourceParameters.PageSize,
                     mainCategory = authorsResourceParameters.MainCategory,
