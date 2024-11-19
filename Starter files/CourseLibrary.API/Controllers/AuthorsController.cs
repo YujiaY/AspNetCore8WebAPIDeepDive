@@ -202,10 +202,20 @@ public class AuthorsController(
         await _courseLibraryRepository.SaveAsync();
 
         var authorToReturn = _mapper.Map<AuthorDto>(authorEntity);
+        
+        // Create links
+        var links = CreateLinksForAuthor(authorToReturn.Id, null);
+        
+        // Add links
+        var linkedResourceToReturn = authorToReturn.ShapeData(null)
+            as IDictionary<string, object?>;
+        
+        linkedResourceToReturn.Add("links", links);
 
         return CreatedAtRoute("GetAuthor",
-            new { authorId = authorToReturn.Id },
-            authorToReturn);
+            // new { authorId = authorToReturn.Id },
+            new { authorId = linkedResourceToReturn["Id"] },
+            linkedResourceToReturn);
     }
 
     [HttpOptions]
