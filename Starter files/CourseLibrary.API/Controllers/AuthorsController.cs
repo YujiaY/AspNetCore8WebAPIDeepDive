@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Dynamic;
+using System.Text.Json;
 using AutoMapper;
 using CourseLibrary.API.Entities;
 using CourseLibrary.API.Helpers;
@@ -57,7 +58,7 @@ public class AuthorsController(
                     searchQuery = authorsResourceParameters.SearchQuery,
                 }),
 
-            _ => Url.Link(nameof(GetAuthors),
+            ResourceUriType.Current or _ => Url.Link(nameof(GetAuthors),
                 new
                 {
                     fields = authorsResourceParameters.Fields,
@@ -98,6 +99,20 @@ public class AuthorsController(
         authorLinks.Add(
             new(Url.Link("GetCoursesForAuthor", new { authorId }),
                 "courses",
+                "GET"));
+        
+        return authorLinks;
+    }
+    
+    private IEnumerable<LinkDto> CreateLinksForAuthors(AuthorsResourceParameters authorsResourceParameters)
+    {
+        var authorLinks = new List<LinkDto>();
+
+        // Self
+        authorLinks.Add(
+            new LinkDto(CreateAuthorResourceUri(authorsResourceParameters,
+                ResourceUriType.Current),
+                "self",
                 "GET"));
         
         return authorLinks;
@@ -150,10 +165,32 @@ public class AuthorsController(
         
         Response.Headers.Add("X-Pagination", 
             JsonSerializer.Serialize(paginationMetadata));
+        
+        // Create links
+        IEnumerable<LinkDto> links = CreateLinksForAuthors(authorsResourceParameters);
+        
+        IEnumerable<ExpandoObject> shapedAuthors = _mapper.Map<IEnumerable<AuthorDto>>(authorsFromRepo)
+            .ShapeData(authorsResourceParameters.Fields);
+
+        var shapedAuthorsWithLinks = shapedAuthors.Select(author =>
+        {
+            var authorAsDictionary = author as IDictionary<string, object?>;
+            var authorsLinks = CreateLinksForAuthor(
+                (Guid)authorAsDictionary["Id"],
+                null);
+            authorAsDictionary.Add("Links", authorsLinks);
+
+            return authorAsDictionary;
+        });
+
+        var linkedCollectionResource = new
+        {
+            value = shapedAuthorsWithLinks,
+            links
+        };
 
         // return them
-        return Ok(_mapper.Map<IEnumerable<AuthorDto>>(authorsFromRepo)
-                .ShapeData(authorsResourceParameters.Fields));
+        return Ok(linkedCollectionResource);
     }
 
     [HttpGet("{authorId}", Name = "GetAuthor")]
