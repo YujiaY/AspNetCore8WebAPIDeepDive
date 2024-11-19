@@ -104,7 +104,9 @@ public class AuthorsController(
         return authorLinks;
     }
     
-    private IEnumerable<LinkDto> CreateLinksForAuthors(AuthorsResourceParameters authorsResourceParameters)
+    private IEnumerable<LinkDto> CreateLinksForAuthors(AuthorsResourceParameters authorsResourceParameters,
+        bool hasNextPage,
+        bool hasPreviousPage)
     {
         var authorLinks = new List<LinkDto>();
 
@@ -114,6 +116,24 @@ public class AuthorsController(
                 ResourceUriType.Current),
                 "self",
                 "GET"));
+
+        if (hasNextPage)
+        {
+            authorLinks.Add(
+                new LinkDto(CreateAuthorResourceUri(authorsResourceParameters,
+                        ResourceUriType.NextPage),
+                    "nextPage",
+                    "GET"));
+        }
+        
+        if (hasPreviousPage)
+        {
+            authorLinks.Add(
+                new LinkDto(CreateAuthorResourceUri(authorsResourceParameters,
+                        ResourceUriType.PreviousPage),
+                    "previousPage",
+                    "GET"));
+        }
         
         return authorLinks;
     }
@@ -145,13 +165,13 @@ public class AuthorsController(
         PageList<Author> authorsFromRepo = await _courseLibraryRepository
             .GetAuthorsAsync(authorsResourceParameters);
 
-        string? previousPageLink = authorsFromRepo.HasPreviousPage
-            ? CreateAuthorResourceUri(authorsResourceParameters, ResourceUriType.PreviousPage)
-            : null;
-
-        string? nextPageLink = authorsFromRepo.HasNextPage
-            ? CreateAuthorResourceUri(authorsResourceParameters, ResourceUriType.NextPage)
-            : null;
+        // string? previousPageLink = authorsFromRepo.HasPreviousPage
+        //     ? CreateAuthorResourceUri(authorsResourceParameters, ResourceUriType.PreviousPage)
+        //     : null;
+        //
+        // string? nextPageLink = authorsFromRepo.HasNextPage
+        //     ? CreateAuthorResourceUri(authorsResourceParameters, ResourceUriType.NextPage)
+        //     : null;
 
         var paginationMetadata = new
         {
@@ -159,15 +179,17 @@ public class AuthorsController(
             pageSize = authorsFromRepo.PageSize,
             currentPage = authorsFromRepo.CurrentPage,
             totalPages = authorsFromRepo.TotalPages,
-            previousPageLink,
-            nextPageLink,
+            // previousPageLink,
+            // nextPageLink,
         };
         
         Response.Headers.Add("X-Pagination", 
             JsonSerializer.Serialize(paginationMetadata));
         
         // Create links
-        IEnumerable<LinkDto> links = CreateLinksForAuthors(authorsResourceParameters);
+        IEnumerable<LinkDto> links = CreateLinksForAuthors(authorsResourceParameters,
+            authorsFromRepo.HasNextPage,
+            authorsFromRepo.HasPreviousPage);
         
         IEnumerable<ExpandoObject> shapedAuthors = _mapper.Map<IEnumerable<AuthorDto>>(authorsFromRepo)
             .ShapeData(authorsResourceParameters.Fields);
