@@ -225,15 +225,15 @@ public class AuthorsController(
             .GetTypedHeaders().Accept;
 
         // TODO: Try TryParseList
-        if (acceptHeader.Count == 0)
+        // if (acceptHeader.Count == 0)
         // if (!MediaTypeHeaderValue.TryParse(mediaType,
         //         out MediaTypeHeaderValue? parsedMediaType))
-        {
-            return BadRequest(
-                _problemDetailsFactory.CreateProblemDetails(HttpContext,
-                    statusCode: StatusCodes.Status400BadRequest,
-                    detail: "Accept header media type value is not a valid media type."));
-        }
+        // {
+        //     return BadRequest(
+        //         _problemDetailsFactory.CreateProblemDetails(HttpContext,
+        //             statusCode: StatusCodes.Status400BadRequest,
+        //             detail: "Accept header media type value is not a valid media type."));
+        // }
         
         if (!_propertyCheckerService.TypeHasProperties<AuthorDto>(
                 fields))
@@ -255,7 +255,8 @@ public class AuthorsController(
         }
 
         // if (parsedMediaType.MediaType == "application/vnd.magicit.hateoas+json")
-        if (acceptHeader.Any(h => h.MediaType == "application/vnd.magicit.hateoas+json"))
+        if (acceptHeader.Any(h =>
+                h.MediaType == "application/vnd.magicit.hateoas+json"))
         {
             // Create links
             IEnumerable<LinkDto> links = CreateLinksForAuthor(authorId, fields);
