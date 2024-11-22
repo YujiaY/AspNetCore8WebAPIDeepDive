@@ -221,9 +221,13 @@ public class AuthorsController(
         string? fields,
         [FromHeader(Name = "Accept")] string? mediaType)
     {
+        var acceptHeader = HttpContext.Request
+            .GetTypedHeaders().Accept;
+
         // TODO: Try TryParseList
-        if (!MediaTypeHeaderValue.TryParse(mediaType,
-                out MediaTypeHeaderValue? parsedMediaType))
+        if (acceptHeader.Count == 0)
+        // if (!MediaTypeHeaderValue.TryParse(mediaType,
+        //         out MediaTypeHeaderValue? parsedMediaType))
         {
             return BadRequest(
                 _problemDetailsFactory.CreateProblemDetails(HttpContext,
@@ -250,7 +254,8 @@ public class AuthorsController(
             return NotFound();
         }
 
-        if (parsedMediaType.MediaType == "application/vnd.magicit.hateoas+json")
+        // if (parsedMediaType.MediaType == "application/vnd.magicit.hateoas+json")
+        if (acceptHeader.Any(h => h.MediaType == "application/vnd.magicit.hateoas+json"))
         {
             // Create links
             IEnumerable<LinkDto> links = CreateLinksForAuthor(authorId, fields);
