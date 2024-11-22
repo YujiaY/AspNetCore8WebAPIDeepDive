@@ -1,4 +1,5 @@
 ﻿using System.Dynamic;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using AutoMapper;
 using CourseLibrary.API.Entities;
@@ -217,8 +218,18 @@ public class AuthorsController(
 
     [HttpGet("{authorId}", Name = "GetAuthor")]
     public async Task<IActionResult> GetAuthor(Guid authorId,
-        string? fields)
+        string? fields,
+        [FromHeader(Name = "Accept")] string? mediaType)
     {
+        // TODO: Try TryParseList
+        if (!MediaTypeHeaderValue.TryParse(mediaType,
+                out MediaTypeHeaderValue? parsedMediaType))
+        {
+            return BadRequest(
+                _problemDetailsFactory.CreateProblemDetails(HttpContext,
+                    statusCode: StatusCodes.Status400BadRequest,
+                    detail: "Accept header media type value is not a valid media type."));
+        }
         
         if (!_propertyCheckerService.TypeHasProperties<AuthorDto>(
                 fields))
@@ -238,18 +249,23 @@ public class AuthorsController(
         {
             return NotFound();
         }
-        
-        // Create links
-        IEnumerable<LinkDto> links = CreateLinksForAuthor(authorId, fields);
-        
-        // Add
-        var linkedResourceToReturn = _mapper.Map<AuthorDto>(authorFromRepo)
-            .ShapeData(fields) as IDictionary<string, object?>;
 
-        linkedResourceToReturn.Add("links", links);
+        if (parsedMediaType.MediaType == "application/vnd.magicit.hateoas+json")
+        {
+            // Create links
+            IEnumerable<LinkDto> links = CreateLinksForAuthor(authorId, fields);
+            
+            // Add
+            var linkedResourceToReturn = _mapper.Map<AuthorDto>(authorFromRepo)
+                .ShapeData(fields) as IDictionary<string, object?>;
+
+            linkedResourceToReturn.Add("links", links);
         
-        // return author
-        return Ok(linkedResourceToReturn);
+            // return author
+            return Ok(linkedResourceToReturn);
+        }
+        
+        return Ok(_mapper.Map<AuthorDto>(authorFromRepo));
     }
 
     [HttpPost(Name = nameof(CreateAuthor))]

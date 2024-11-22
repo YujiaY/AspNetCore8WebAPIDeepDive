@@ -62,6 +62,18 @@ internal static class StartupHelperExtensions
                 };
             });
 
+        builder.Services.Configure<MvcOptions>(config =>
+        {
+            var newtonsoftJsonOutputFormatter = config.OutputFormatters
+                .OfType<NewtonsoftJsonOutputFormatter>()?.FirstOrDefault();
+
+            if (newtonsoftJsonOutputFormatter != null)
+            {
+                newtonsoftJsonOutputFormatter.SupportedMediaTypes
+                    .Add("application/vnd.magicit.hateoas+json");
+            }
+        });
+
         builder.Services.AddTransient<IPropertyMappingService, PropertyMappingService>();
         builder.Services.AddTransient<IPropertyCheckerService, PropertyCheckerService>();
         
