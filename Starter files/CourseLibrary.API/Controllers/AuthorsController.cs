@@ -222,7 +222,7 @@ public class AuthorsController(
         "application/vnd.magicit.author.friendly+json")]
     [Produces("application/json",
         "application/vnd.magicit.author.friendly+json")]
-    [HttpGet("{authorId}", Name = "GetAuthorWithoutLinks")]
+    [HttpGet("{authorId}", Name = "GetAuthor")]
     public async Task<IActionResult> GetAuthorWithoutLinks(Guid authorId,
         string? fields,
         [FromHeader(Name = "Accept")] string? mediaType)
@@ -259,7 +259,7 @@ public class AuthorsController(
         "application/vnd.magicit.author.friendly.hateoas+json")]
     [Produces("application/vnd.magicit.hateoas+json",
         "application/vnd.magicit.author.friendly.hateoas+json")]
-    [HttpGet("{authorId}", Name = "GetAuthorWithLinks")]
+    [HttpGet("{authorId}", Name = "GetAuthor")]
     public async Task<IActionResult> GetAuthorWithLinks(Guid authorId,
         string? fields,
         [FromHeader(Name = "Accept")] string? mediaType)
@@ -297,7 +297,7 @@ public class AuthorsController(
     [RequestHeaderMatchesMediaType("Accept",
         "application/vnd.magicit.author.full+json")]
     [Produces("application/vnd.magicit.author.full+json")]
-    [HttpGet("{authorId}", Name = nameof(GetFullAuthorWithoutLinks))]
+    [HttpGet("{authorId}", Name = "GetAuthor")]
     public async Task<IActionResult> GetFullAuthorWithoutLinks(Guid authorId,
         string? fields,
         [FromHeader(Name = "Accept")] string? mediaType)
@@ -331,7 +331,7 @@ public class AuthorsController(
     [RequestHeaderMatchesMediaType("Accept",
         "application/vnd.magicit.author.full.hateoas+json")]
     [Produces("application/vnd.magicit.author.full.hateoas+json")]
-    [HttpGet("{authorId}", Name = nameof(GetFullAuthorWithLinks))]
+    [HttpGet("{authorId}", Name = "GetAuthor")]
     public async Task<IActionResult> GetFullAuthorWithLinks(Guid authorId,
         string? fields,
         [FromHeader(Name = "Accept")] string? mediaType)
