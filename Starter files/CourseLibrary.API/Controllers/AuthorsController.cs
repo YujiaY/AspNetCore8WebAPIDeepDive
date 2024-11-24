@@ -217,6 +217,155 @@ public class AuthorsController(
         return Ok(linkedCollectionResource);
     }
 
+    [RequestHeaderMatchesMediaType("Accept",
+        "application/json",
+        "application/vnd.magicit.author.friendly+json")]
+    [Produces("application/json",
+        "application/vnd.magicit.author.friendly+json")]
+    [HttpGet("{authorId}", Name = "GetAuthorWithoutLinks")]
+    public async Task<IActionResult> GetAuthorWithoutLinks(Guid authorId,
+        string? fields,
+        [FromHeader(Name = "Accept")] string? mediaType)
+    {
+        if (!_propertyCheckerService.TypeHasProperties<AuthorDto>(
+                fields))
+        {
+            return BadRequest(
+                _problemDetailsFactory.CreateProblemDetails(
+                    HttpContext,
+                    statusCode: StatusCodes.Status400BadRequest,
+                    detail: $"Not all requested data shaping fields exist on " +
+                            $"the resource: {fields}"));
+        }
+        
+        // get author from repo
+        var authorFromRepo = await _courseLibraryRepository.GetAuthorAsync(authorId);
+
+        if (authorFromRepo == null)
+        {
+            return NotFound();
+        }
+
+        // friendly author
+        var friendlyResourceToReturn = _mapper.Map<AuthorDto>(authorFromRepo)
+            .ShapeData(fields) as IDictionary<string, object?>;
+        
+
+        return Ok(friendlyResourceToReturn);
+    }
+
+    [RequestHeaderMatchesMediaType("Accept",
+        "application/vnd.magicit.hateoas+json",
+        "application/vnd.magicit.author.friendly.hateoas+json")]
+    [Produces("application/vnd.magicit.hateoas+json",
+        "application/vnd.magicit.author.friendly.hateoas+json")]
+    [HttpGet("{authorId}", Name = "GetAuthorWithLinks")]
+    public async Task<IActionResult> GetAuthorWithLinks(Guid authorId,
+        string? fields,
+        [FromHeader(Name = "Accept")] string? mediaType)
+    {
+        if (!_propertyCheckerService.TypeHasProperties<AuthorDto>(
+                fields))
+        {
+            return BadRequest(
+                _problemDetailsFactory.CreateProblemDetails(
+                    HttpContext,
+                    statusCode: StatusCodes.Status400BadRequest,
+                    detail: $"Not all requested data shaping fields exist on " +
+                            $"the resource: {fields}"));
+        }
+        
+        // get author from repo
+        var authorFromRepo = await _courseLibraryRepository.GetAuthorAsync(authorId);
+
+        if (authorFromRepo == null)
+        {
+            return NotFound();
+        }
+
+        IEnumerable<LinkDto> links = CreateLinksForAuthor(authorId, fields);
+
+        // friendly author
+        var friendlyResourceToReturn = _mapper.Map<AuthorDto>(authorFromRepo)
+            .ShapeData(fields) as IDictionary<string, object?>;
+        
+        friendlyResourceToReturn.Add("links", links);
+
+        return Ok(friendlyResourceToReturn);
+    }
+    
+    [RequestHeaderMatchesMediaType("Accept",
+        "application/vnd.magicit.author.full+json")]
+    [Produces("application/vnd.magicit.author.full+json")]
+    [HttpGet("{authorId}", Name = nameof(GetFullAuthorWithoutLinks))]
+    public async Task<IActionResult> GetFullAuthorWithoutLinks(Guid authorId,
+        string? fields,
+        [FromHeader(Name = "Accept")] string? mediaType)
+    {
+        if (!_propertyCheckerService.TypeHasProperties<AuthorDto>(
+                fields))
+        {
+            return BadRequest(
+                _problemDetailsFactory.CreateProblemDetails(
+                    HttpContext,
+                    statusCode: StatusCodes.Status400BadRequest,
+                    detail: $"Not all requested data shaping fields exist on " +
+                            $"the resource: {fields}"));
+        }
+        
+        // get author from repo
+        var authorFromRepo = await _courseLibraryRepository.GetAuthorAsync(authorId);
+
+        if (authorFromRepo == null)
+        {
+            return NotFound();
+        }
+
+        // full author
+        var fullResourceToReturn = _mapper.Map<AuthorFullDto>(authorFromRepo)
+            .ShapeData(fields) as IDictionary<string, object?>;
+
+        return Ok(fullResourceToReturn);
+    }
+    
+    [RequestHeaderMatchesMediaType("Accept",
+        "application/vnd.magicit.author.full.hateoas+json")]
+    [Produces("application/vnd.magicit.author.full.hateoas+json")]
+    [HttpGet("{authorId}", Name = nameof(GetFullAuthorWithLinks))]
+    public async Task<IActionResult> GetFullAuthorWithLinks(Guid authorId,
+        string? fields,
+        [FromHeader(Name = "Accept")] string? mediaType)
+    {
+        if (!_propertyCheckerService.TypeHasProperties<AuthorDto>(
+                fields))
+        {
+            return BadRequest(
+                _problemDetailsFactory.CreateProblemDetails(
+                    HttpContext,
+                    statusCode: StatusCodes.Status400BadRequest,
+                    detail: $"Not all requested data shaping fields exist on " +
+                            $"the resource: {fields}"));
+        }
+        
+        // get author from repo
+        var authorFromRepo = await _courseLibraryRepository.GetAuthorAsync(authorId);
+
+        if (authorFromRepo == null)
+        {
+            return NotFound();
+        }
+
+        // full author
+        var fullResourceToReturn = _mapper.Map<AuthorFullDto>(authorFromRepo)
+            .ShapeData(fields) as IDictionary<string, object?>;
+
+        IEnumerable<LinkDto> links = CreateLinksForAuthor(authorId, fields);
+
+        fullResourceToReturn.Add("links", links);
+        
+        return Ok(fullResourceToReturn);
+    }
+
     [Produces("application/json", 
         "application/vnd.magicit.hateoas+json",
         "application/vnd.magicit.author.full+json", 
