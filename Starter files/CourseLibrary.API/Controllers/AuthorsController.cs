@@ -227,19 +227,50 @@ public class AuthorsController(
         string? fields,
         [FromHeader(Name = "Accept")] string? mediaType)
     {
-        var acceptHeader = HttpContext.Request
-            .GetTypedHeaders().Accept;
+        // var acceptHeader = HttpContext.Request
+        //     .GetTypedHeaders().Accept;
 
         // TODO: Try TryParseList
         // if (acceptHeader.Count == 0)
-        if (!MediaTypeHeaderValue.TryParse(mediaType,
-                out MediaTypeHeaderValue? parsedMediaType))
+        var parsedMediaType = MediaTypeHeaderValue.Parse("application/json");
+
+        // Check if mediaType is null or empty
+        if (string.IsNullOrEmpty(mediaType) || mediaType == "*/*")
         {
-            return BadRequest(
-                _problemDetailsFactory.CreateProblemDetails(HttpContext,
-                    statusCode: StatusCodes.Status400BadRequest,
-                    detail: "Accept header media type value is not a valid media type."));
+            // Assign default media type
+            parsedMediaType = MediaTypeHeaderValue.Parse("application/json");
         }
+        else
+        {
+            // mediaType is not null here
+            var testInputNotNull = new List<string> { mediaType };
+            
+            if (!MediaTypeHeaderValue.TryParseList(testInputNotNull,
+                    out  IList<MediaTypeHeaderValue>? mediaTypeList))
+            {
+                if (mediaTypeList == null)
+                {
+                    return BadRequest(
+                        _problemDetailsFactory.CreateProblemDetails(HttpContext,
+                            statusCode: StatusCodes.Status400BadRequest,
+                            detail: "Accept header media type values are not a valid media type."));
+                }
+            }
+            
+            var firstHateoasMediaType = mediaTypeList.FirstOrDefault(type => 
+                type.MediaType.Value != null && type.MediaType.Value.Contains("hateoas", StringComparison.InvariantCultureIgnoreCase));
+            
+            parsedMediaType = firstHateoasMediaType ?? parsedMediaType; 
+        }
+
+        // if (!MediaTypeHeaderValue.TryParse(mediaType,
+        //         out MediaTypeHeaderValue? parsedMediaType))
+        // {
+        //     return BadRequest(
+        //         _problemDetailsFactory.CreateProblemDetails(HttpContext,
+        //             statusCode: StatusCodes.Status400BadRequest,
+        //             detail: "Accept header media type value is not a valid media type."));
+        // }
         
         if (!_propertyCheckerService.TypeHasProperties<AuthorDto>(
                 fields))
@@ -260,7 +291,7 @@ public class AuthorsController(
             return NotFound();
         }
 
-        var subType = parsedMediaType.SubTypeWithoutSuffix;
+        var subType = parsedMediaType?.SubTypeWithoutSuffix ?? string.Empty; 
         var shouldIncludeLinks = subType.EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
 
         IEnumerable<LinkDto> links = new List<LinkDto>();
