@@ -1,6 +1,7 @@
 ﻿using System.Dynamic;
 using System.Text.Json;
 using AutoMapper;
+using CourseLibrary.API.ActionConstraints;
 using CourseLibrary.API.Entities;
 using CourseLibrary.API.Helpers;
 using CourseLibrary.API.Models;
@@ -349,9 +350,45 @@ public class AuthorsController(
         //
         // return Ok(_mapper.Map<AuthorDto>(authorFromRepo));
     }
+    
+    
+    [HttpPost(Name = nameof(CreateAuthorWithDateOfDeath))]
+    [RequestHeaderMatchesMediaType("Content-Type",
+        "application/vnd.magicit.authorforcreationwithdateofdeath+json")]
+    [Consumes("application/vnd.magicit.authorforcreationwithdateofdeath+json")]
+    public async Task<ActionResult<AuthorDto>> CreateAuthorWithDateOfDeath(
+        AuthorForCreationWithDateOfDeathDto authorDto)
+    {
+        var authorEntity = _mapper.Map<Entities.Author>(authorDto);
+
+        _courseLibraryRepository.AddAuthor(authorEntity);
+        await _courseLibraryRepository.SaveAsync();
+
+        var authorToReturn = _mapper.Map<AuthorDto>(authorEntity);
+        
+        // Create links
+        var links = CreateLinksForAuthor(authorToReturn.Id, null);
+        
+        // Add links
+        var linkedResourceToReturn = authorToReturn.ShapeData(null)
+            as IDictionary<string, object?>;
+        
+        linkedResourceToReturn.Add("links", links);
+
+        return CreatedAtRoute("GetAuthor",
+            // new { authorId = authorToReturn.Id },
+            new { authorId = linkedResourceToReturn["Id"] },
+            linkedResourceToReturn);
+    }
 
     [HttpPost(Name = nameof(CreateAuthor))]
-    public async Task<ActionResult<AuthorDto>> CreateAuthor(AuthorForCreationDto authorDto)
+    [RequestHeaderMatchesMediaType("Content-Type",
+        "application/json",
+        "application/vnd.magicit.authorforcreation+json")]
+    [Consumes("application/json",
+        "application/vnd.magicit.authorforcreation+json")]
+    public async Task<ActionResult<AuthorDto>> CreateAuthor(
+        AuthorForCreationDto authorDto)
     {
         var authorEntity = _mapper.Map<Entities.Author>(authorDto);
 
