@@ -366,141 +366,140 @@ public class AuthorsController(
         return Ok(fullResourceToReturn);
     }
 
-    [Produces("application/json", 
-        "application/vnd.magicit.hateoas+json",
-        "application/vnd.magicit.author.full+json", 
-        "application/vnd.magicit.author.full.hateoas+json",
-        "application/vnd.magicit.author.friendly+json", 
-        "application/vnd.magicit.author.friendly.hateoas+json")]
-    [HttpGet("{authorId}", Name = "GetAuthor")]
-    public async Task<IActionResult> GetAuthor(Guid authorId,
-        string? fields,
-        [FromHeader(Name = "Accept")] string? mediaType)
-    {
-        // var acceptHeader = HttpContext.Request
-        //     .GetTypedHeaders().Accept;
+    // [Produces("application/json", 
+    //     "application/vnd.magicit.hateoas+json",
+    //     "application/vnd.magicit.author.full+json", 
+    //     "application/vnd.magicit.author.full.hateoas+json",
+    //     "application/vnd.magicit.author.friendly+json", 
+    //     "application/vnd.magicit.author.friendly.hateoas+json")]
+    // [HttpGet("{authorId}", Name = "GetAuthor")]
+    // public async Task<IActionResult> GetAuthor(Guid authorId,
+    //     string? fields,
+    //     [FromHeader(Name = "Accept")] string? mediaType)
+    // {
+    //     // var acceptHeader = HttpContext.Request
+    //     //     .GetTypedHeaders().Accept;
+    //
+    //     // TODO: Try TryParseList
+    //     // if (acceptHeader.Count == 0)
+    //     var parsedMediaType = MediaTypeHeaderValue.Parse("application/json");
+    //
+    //     // Check if mediaType is null or empty
+    //     if (string.IsNullOrEmpty(mediaType) || mediaType == "*/*")
+    //     {
+    //         // Assign default media type
+    //         parsedMediaType = MediaTypeHeaderValue.Parse("application/json");
+    //     }
+    //     else
+    //     {
+    //         // mediaType is not null here
+    //         var testInputNotNull = new List<string> { mediaType };
+    //         
+    //         if (!MediaTypeHeaderValue.TryParseList(testInputNotNull,
+    //                 out  IList<MediaTypeHeaderValue>? mediaTypeList))
+    //         {
+    //             if (mediaTypeList == null)
+    //             {
+    //                 return BadRequest(
+    //                     _problemDetailsFactory.CreateProblemDetails(HttpContext,
+    //                         statusCode: StatusCodes.Status400BadRequest,
+    //                         detail: "Accept header media type values are not a valid media type."));
+    //             }
+    //         }
+    //         
+    //         var firstHateoasMediaType = mediaTypeList.FirstOrDefault(type => 
+    //             type.MediaType.Value != null && type.MediaType.Value.Contains("hateoas", StringComparison.InvariantCultureIgnoreCase));
+    //         
+    //         parsedMediaType = firstHateoasMediaType ?? parsedMediaType; 
+    //     }
+    //
+    //     // if (!MediaTypeHeaderValue.TryParse(mediaType,
+    //     //         out MediaTypeHeaderValue? parsedMediaType))
+    //     // {
+    //     //     return BadRequest(
+    //     //         _problemDetailsFactory.CreateProblemDetails(HttpContext,
+    //     //             statusCode: StatusCodes.Status400BadRequest,
+    //     //             detail: "Accept header media type value is not a valid media type."));
+    //     // }
+    //     
+    //     if (!_propertyCheckerService.TypeHasProperties<AuthorDto>(
+    //             fields))
+    //     {
+    //         return BadRequest(
+    //             _problemDetailsFactory.CreateProblemDetails(
+    //                 HttpContext,
+    //                 statusCode: StatusCodes.Status400BadRequest,
+    //                 detail: $"Not all requested data shaping fields exist on " +
+    //                         $"the resource: {fields}"));
+    //     }
+    //     
+    //     // get author from repo
+    //     var authorFromRepo = await _courseLibraryRepository.GetAuthorAsync(authorId);
+    //
+    //     if (authorFromRepo == null)
+    //     {
+    //         return NotFound();
+    //     }
+    //
+    //     var subType = parsedMediaType?.SubTypeWithoutSuffix ?? string.Empty; 
+    //     var shouldIncludeLinks = subType.EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+    //
+    //     IEnumerable<LinkDto> links = new List<LinkDto>();
+    //
+    //     if (shouldIncludeLinks)
+    //     {
+    //         links = CreateLinksForAuthor(authorId, fields);
+    //     }
+    //     
+    //     var primaryMediaType = shouldIncludeLinks ?
+    //         parsedMediaType.SubTypeWithoutSuffix.Substring(
+    //             0, parsedMediaType.SubTypeWithoutSuffix.Length - 8)
+    //         : parsedMediaType.SubTypeWithoutSuffix;
+    //     
+    //     // full Author
+    //     if (primaryMediaType == "vnd.magicit.author.full")
+    //     {
+    //         var fullResourceToReturn = _mapper.Map<AuthorFullDto>(authorFromRepo)
+    //             .ShapeData(fields) as IDictionary<string, object?>;
+    //
+    //         if (shouldIncludeLinks)
+    //         {
+    //             fullResourceToReturn.Add("links", links);
+    //         }
+    //         
+    //         return Ok(fullResourceToReturn);
+    //     }
+    //     
+    //     // friendly author
+    //     var friendlyResourceToReturn = _mapper.Map<AuthorDto>(authorFromRepo)
+    //         .ShapeData(fields) as IDictionary<string, object?>;
+    //
+    //     if (shouldIncludeLinks)
+    //     {
+    //         friendlyResourceToReturn.Add("links", links);
+    //     }
+    //         
+    //     return Ok(friendlyResourceToReturn);
+    //     // if (parsedMediaType.MediaType == "application/vnd.magicit.hateoas+json")
+    //     // // if (acceptHeader.Any(h =>
+    //     // //         h.MediaType == "application/vnd.magicit.hateoas+json"))
+    //     // {
+    //     //     // Create links
+    //     //     links = CreateLinksForAuthor(authorId, fields);
+    //     //     
+    //     //     // Add
+    //     //     var linkedResourceToReturn = _mapper.Map<AuthorDto>(authorFromRepo)
+    //     //         .ShapeData(fields) as IDictionary<string, object?>;
+    //     //
+    //     //     linkedResourceToReturn.Add("links", links);
+    //     //
+    //     //     // return author
+    //     //     return Ok(linkedResourceToReturn);
+    //     // }
+    //     //
+    //     // return Ok(_mapper.Map<AuthorDto>(authorFromRepo));
+    // }
 
-        // TODO: Try TryParseList
-        // if (acceptHeader.Count == 0)
-        var parsedMediaType = MediaTypeHeaderValue.Parse("application/json");
-
-        // Check if mediaType is null or empty
-        if (string.IsNullOrEmpty(mediaType) || mediaType == "*/*")
-        {
-            // Assign default media type
-            parsedMediaType = MediaTypeHeaderValue.Parse("application/json");
-        }
-        else
-        {
-            // mediaType is not null here
-            var testInputNotNull = new List<string> { mediaType };
-            
-            if (!MediaTypeHeaderValue.TryParseList(testInputNotNull,
-                    out  IList<MediaTypeHeaderValue>? mediaTypeList))
-            {
-                if (mediaTypeList == null)
-                {
-                    return BadRequest(
-                        _problemDetailsFactory.CreateProblemDetails(HttpContext,
-                            statusCode: StatusCodes.Status400BadRequest,
-                            detail: "Accept header media type values are not a valid media type."));
-                }
-            }
-            
-            var firstHateoasMediaType = mediaTypeList.FirstOrDefault(type => 
-                type.MediaType.Value != null && type.MediaType.Value.Contains("hateoas", StringComparison.InvariantCultureIgnoreCase));
-            
-            parsedMediaType = firstHateoasMediaType ?? parsedMediaType; 
-        }
-
-        // if (!MediaTypeHeaderValue.TryParse(mediaType,
-        //         out MediaTypeHeaderValue? parsedMediaType))
-        // {
-        //     return BadRequest(
-        //         _problemDetailsFactory.CreateProblemDetails(HttpContext,
-        //             statusCode: StatusCodes.Status400BadRequest,
-        //             detail: "Accept header media type value is not a valid media type."));
-        // }
-        
-        if (!_propertyCheckerService.TypeHasProperties<AuthorDto>(
-                fields))
-        {
-            return BadRequest(
-                _problemDetailsFactory.CreateProblemDetails(
-                    HttpContext,
-                    statusCode: StatusCodes.Status400BadRequest,
-                    detail: $"Not all requested data shaping fields exist on " +
-                            $"the resource: {fields}"));
-        }
-        
-        // get author from repo
-        var authorFromRepo = await _courseLibraryRepository.GetAuthorAsync(authorId);
-
-        if (authorFromRepo == null)
-        {
-            return NotFound();
-        }
-
-        var subType = parsedMediaType?.SubTypeWithoutSuffix ?? string.Empty; 
-        var shouldIncludeLinks = subType.EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
-
-        IEnumerable<LinkDto> links = new List<LinkDto>();
-
-        if (shouldIncludeLinks)
-        {
-            links = CreateLinksForAuthor(authorId, fields);
-        }
-        
-        var primaryMediaType = shouldIncludeLinks ?
-            parsedMediaType.SubTypeWithoutSuffix.Substring(
-                0, parsedMediaType.SubTypeWithoutSuffix.Length - 8)
-            : parsedMediaType.SubTypeWithoutSuffix;
-        
-        // full Author
-        if (primaryMediaType == "vnd.magicit.author.full")
-        {
-            var fullResourceToReturn = _mapper.Map<AuthorFullDto>(authorFromRepo)
-                .ShapeData(fields) as IDictionary<string, object?>;
-
-            if (shouldIncludeLinks)
-            {
-                fullResourceToReturn.Add("links", links);
-            }
-            
-            return Ok(fullResourceToReturn);
-        }
-        
-        // friendly author
-        var friendlyResourceToReturn = _mapper.Map<AuthorDto>(authorFromRepo)
-            .ShapeData(fields) as IDictionary<string, object?>;
-
-        if (shouldIncludeLinks)
-        {
-            friendlyResourceToReturn.Add("links", links);
-        }
-            
-        return Ok(friendlyResourceToReturn);
-        // if (parsedMediaType.MediaType == "application/vnd.magicit.hateoas+json")
-        // // if (acceptHeader.Any(h =>
-        // //         h.MediaType == "application/vnd.magicit.hateoas+json"))
-        // {
-        //     // Create links
-        //     links = CreateLinksForAuthor(authorId, fields);
-        //     
-        //     // Add
-        //     var linkedResourceToReturn = _mapper.Map<AuthorDto>(authorFromRepo)
-        //         .ShapeData(fields) as IDictionary<string, object?>;
-        //
-        //     linkedResourceToReturn.Add("links", links);
-        //
-        //     // return author
-        //     return Ok(linkedResourceToReturn);
-        // }
-        //
-        // return Ok(_mapper.Map<AuthorDto>(authorFromRepo));
-    }
-    
-    
     [HttpPost(Name = nameof(CreateAuthorWithDateOfDeath))]
     [RequestHeaderMatchesMediaType("Content-Type",
         "application/vnd.magicit.authorforcreationwithdateofdeath+json")]
