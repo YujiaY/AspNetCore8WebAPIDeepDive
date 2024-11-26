@@ -17,6 +17,10 @@ internal static class StartupHelperExtensions
         builder.Services.AddControllers(configure =>
             {
                 configure.ReturnHttpNotAcceptable = true;
+
+                configure.CacheProfiles.Add("240SecondsCacheProfile",
+                    new CacheProfile { Duration = 240 });
+
                 // Way 1
                 // configure.OutputFormatters.Clear();
                 // configure.OutputFormatters.Add

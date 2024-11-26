@@ -12,6 +12,7 @@ namespace CourseLibrary.API.Controllers;
 
 [ApiController]
 [Route("api/authors/{authorId}/courses")]
+[ResponseCache(CacheProfileName = "240SecondsCacheProfile")]
 public class CoursesController(ICourseLibraryRepository courseLibraryRepository,
     IMapper mapper) : ControllerBase
 {
