@@ -2,6 +2,7 @@
 using CourseLibrary.API.Entities;
 using CourseLibrary.API.Models;
 using CourseLibrary.API.Services;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -35,6 +36,8 @@ public class CoursesController(ICourseLibraryRepository courseLibraryRepository,
 
     // [ResponseCache(Duration = 120)]
     [HttpGet("{courseId}", Name = "GetCourseForAuthor")]
+    [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 300)]
+    [HttpCacheValidation(MustRevalidate = false)]
     public async Task<ActionResult<CourseDto>> GetCourseForAuthor(Guid authorId, Guid courseId)
     {
         if (!await _courseLibraryRepository.AuthorExistsAsync(authorId))
