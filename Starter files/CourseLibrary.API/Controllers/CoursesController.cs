@@ -12,7 +12,7 @@ namespace CourseLibrary.API.Controllers;
 
 [ApiController]
 [Route("api/authors/{authorId}/courses")]
-[ResponseCache(CacheProfileName = "240SecondsCacheProfile")]
+// [ResponseCache(CacheProfileName = "240SecondsCacheProfile")]
 public class CoursesController(ICourseLibraryRepository courseLibraryRepository,
     IMapper mapper) : ControllerBase
 {
@@ -33,7 +33,7 @@ public class CoursesController(ICourseLibraryRepository courseLibraryRepository,
         return Ok(_mapper.Map<IEnumerable<CourseDto>>(coursesForAuthorFromRepo));
     }
 
-    [ResponseCache(Duration = 120)]
+    // [ResponseCache(Duration = 120)]
     [HttpGet("{courseId}", Name = "GetCourseForAuthor")]
     public async Task<ActionResult<CourseDto>> GetCourseForAuthor(Guid authorId, Guid courseId)
     {

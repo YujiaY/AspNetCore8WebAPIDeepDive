@@ -94,6 +94,8 @@ internal static class StartupHelperExtensions
 
         builder.Services.AddResponseCaching();
 
+        builder.Services.AddHttpCacheHeaders();
+
         return builder.Build();
     }
 
@@ -119,6 +121,8 @@ internal static class StartupHelperExtensions
         }
 
         app.UseResponseCaching();
+
+        app.UseHttpCacheHeaders();
         
         app.UseAuthorization();
 
